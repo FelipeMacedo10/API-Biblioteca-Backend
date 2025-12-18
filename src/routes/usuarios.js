@@ -16,6 +16,20 @@ router.post('/', async (req, res) => {
   res.status(201).json({ mensagem: 'Usuário criado com sucesso!' });
 });
 
+router.post('/login', async (req, res) => {
+  const { email, senha } = req.body;
+  const [rows] = await pool.query(
+    'SELECT id, nome, email, tipo FROM usuarios WHERE email = ? AND senha = ?',
+    [email, senha]
+  );
+
+  if (rows.length === 0) {
+    return res.status(401).json({ mensagem: 'Credenciais inválidas' });
+  }
+
+  res.json(rows[0]);
+});
+
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   await pool.query('DELETE FROM usuarios WHERE id=?', [id]);
