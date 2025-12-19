@@ -56,4 +56,34 @@ router.delete('/:id', async (req, res) => {
   res.status(204).send();
 });
 
+// Tornar livro disponível novamente
+router.put('/:id/disponivel', async (req, res) => {
+  const { id } = req.params;
+  console.log('📩 Requisição recebida para tornar livro disponível');
+  console.log('➡️ ID recebido:', id);
+
+  try {
+    const [result] = await pool.query(
+      'UPDATE livros SET disponivel = 1 WHERE id = ?',
+      [id]
+    );
+
+    console.log('🛠 Resultado do UPDATE:', result);
+
+    if (result.affectedRows === 0) {
+      console.warn('⚠️ Nenhum livro encontrado com esse ID');
+      return res.status(404).json({ mensagem: 'Livro não encontrado.' });
+    }
+
+    console.log('✅ Livro atualizado com sucesso, ID:', id);
+    res.json({ mensagem: 'Livro marcado como disponível novamente.' });
+  } catch (err) {
+    console.error('❌ Erro ao atualizar livro:', err);
+    res.status(500).json({ mensagem: 'Erro ao atualizar livro.' });
+  }
+});
+
+
+
+
 module.exports = router;
